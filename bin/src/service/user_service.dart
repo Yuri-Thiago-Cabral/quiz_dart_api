@@ -7,7 +7,8 @@ class UserService {
     Map<String, dynamic>? userMap = users.where((element) => element['email'] == email).toList().firstOrNull;
     if (userMap == null || userMap.isEmpty) {
       throw NotFoundExcpetion(
-          'Usuário com e-mail $email não foi encontrado. Certifique-se que o email informado esteja correto.');
+          message:
+              'Usuário com e-mail $email não foi encontrado. Certifique-se que o email informado esteja correto.');
     }
 
     UserModel userModel = UserModel.fromMap(userMap);
