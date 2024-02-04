@@ -1,7 +1,10 @@
-class InvalidAnswerException implements Exception {
-  final String message;
+import 'custom_exception.dart';
 
-  const InvalidAnswerException({this.message = 'A resposta informa está incorreta'});
+class InvalidAnswerException extends CustomException implements Exception {
+  InvalidAnswerException({
+    super.status = 400,
+    super.message = 'A resposta informada está incorreta',
+  });
 
   @override
   String toString() => message;

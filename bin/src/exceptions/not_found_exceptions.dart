@@ -1,7 +1,10 @@
-class NotFoundExcpetion implements Exception {
-  final String message;
+import 'custom_exception.dart';
 
-  const NotFoundExcpetion(this.message);
+class NotFoundExcpetion extends CustomException implements Exception {
+  NotFoundExcpetion({
+    super.status = 404,
+    required super.message,
+  });
 
   @override
   String toString() => message;

@@ -1,6 +1,5 @@
 import 'dart:math';
-
-import '../controller/dto/question_dto.dart';
+import '../controller/dto/response/question_dto.dart';
 import '../data/questions.mock.dart';
 import '../exceptions/answered_question_exception.dart';
 import '../exceptions/invalid_answer_exception.dart';
@@ -25,21 +24,23 @@ class QuizService {
     }
 
     if (localQuestions.isEmpty) {
-      throw NotFoundExcpetion('Ops, não foi possível gerar uma pergunta. Tente novamente');
+      throw NotFoundExcpetion(message: 'Ops, não foi possível gerar uma pergunta. Tente novamente');
     }
 
     int ramdom = _buildRandomNumber(localQuestions.length);
 
     QuestionModel questionModel = QuestionModel.fromMap(localQuestions[ramdom]);
 
-    return QuestionDto(id: questionModel.id, question: questionModel.question);
+    QuestionDto questionDto = QuestionDto(id: questionModel.id, question: questionModel.question);
+
+    return questionDto;
   }
 
   bool answerQuestion(int id, String answerResp, String userEmail) {
     Map<String, dynamic>? question = questions.where((element) => element['id'] == id).toList().firstOrNull;
 
     if (question == null || question.isEmpty) {
-      throw NotFoundExcpetion('Ops, não foi possível encontrar a pergunta com id $id');
+      throw NotFoundExcpetion(message: 'Ops, não foi possível encontrar a pergunta com id $id');
     }
 
     QuestionModel questionModel = QuestionModel.fromMap(question);
@@ -58,18 +59,13 @@ class QuizService {
       throw InvalidAnswerException();
     }
 
-    if (answerIsCorrect) {
-      user.answeredQuestions.add(questionModel);
-      _userService.updateUser(user.toMap());
-    }
+    user.answeredQuestions.add(questionModel);
+    _userService.updateUser(user.toMap());
 
     return answerIsCorrect;
   }
 
   int _buildRandomNumber(int max) {
-    if (max <= 0) {
-      return 0;
-    }
-    return Random().nextInt(max);
+    return max > 0 ? Random().nextInt(max) : 0;
   }
 }

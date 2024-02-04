@@ -1,14 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import '../controller/dto/response/error_dto.dart';
 import '../controller/quiz_controller.dart';
-import '../exceptions/answered_question_exception.dart';
-import '../exceptions/invalid_answer_exception.dart';
-import '../exceptions/not_found_exceptions.dart';
+import '../exceptions/custom_exception.dart';
 
-class Routes {
+class RoutesHandler {
   static final QuizController _quizController = QuizController();
 
   static Router buildRouters() {
@@ -45,22 +42,19 @@ class Routes {
         return await apiAsyncCallback.call(request);
       }
     } catch (error) {
-      if (error is NotFoundExcpetion) {
-        return Response.notFound(jsonEncode({'error': error.message}), headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        });
-      }
-
-      if (error is AnsweredQuestionException) {
-        return Response.forbidden(jsonEncode({'error': error.message}), headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        });
-      }
-
-      if (error is InvalidAnswerException) {
-        return Response.badRequest(body: jsonEncode({'error': error.message}), headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-        });
+      /*
+      Realiza aqui os tratamentos de erro para evitar implementação em cada endpoint (diminuição de complexidade).
+      Evita também o retorno default (internal error) caso alguma tratativa não fosse implementada no endpoint (autenticidade).
+      */
+      if (error is CustomException) {
+        String errorJson = ErrorDto.fromMap({'message': error.message}).toJson();
+        return Response(
+          error.status,
+          body: errorJson,
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+          },
+        );
       }
     }
 
